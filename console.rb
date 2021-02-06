@@ -6,8 +6,7 @@ load 'folder.rb'
 class Console
   attr_accessor :current_user, :exit_signal_received,
                 :working_directory
-  ACCEPTED_COMMANDS = %w[exit create_file show metadata create_folder cd destroy ls].freeze
-  SESSION_FILE = 'session.yaml'.freeze
+  ACCEPTED_COMMANDS = %w[exit create_file show metadata create_folder cd destroy ls whereami].freeze
 
   def initialize
     @current_user = 1
@@ -16,6 +15,7 @@ class Console
   end
 
   def listen
+    @exit_signal_received = false
     until exit_signal_received
       begin
         action = gets
@@ -24,7 +24,7 @@ class Console
         puts e.message
       end
     end
-    persist_console
+    self
   end
 
   private
@@ -57,20 +57,20 @@ class Console
     @working_directory = working_directory.cd(folder_name)
   end
 
+  def whereami
+    puts working_directory.path
+  end
+
+  def ls
+    working_directory.list_content
+  end
+
   def exit
     @exit_signal_received = true
   end
 
   def invalid_command(command)
     puts "Invalid command received: #{command}"
-  end
-
-  def persist_console # Validate if the object is changing while its being persisted
-    session = YAML.dump(self)
-    puts session
-    # File.open(SESSION_FILE, 'w') do |f|
-    #   f.write(session)
-    # end
   end
 end
 
@@ -81,4 +81,18 @@ class MissingArguments < StandardError
   end
 end
 
-Console.new.listen
+def save_session(console)
+  session = YAML.dump(console)
+  puts session
+  file_name = 'session.yaml'
+  File.write(file_name, session)
+end
+
+def load_session
+  YAML.load(File.read('session.yaml'))
+end
+
+# console = Console.new.listen
+console = load_session
+console.listen
+save_session(console)

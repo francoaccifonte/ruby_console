@@ -23,11 +23,11 @@ class Folder
   end
 
   def list_content
-    file_names = files.pluck(:name)
-    folder_names = folders.pluck(:name)
+    file_names = files.map(&:name)
+    folder_names = folders.map(&:name)
     puts(
-      'Files: \n' + files.join(', ') + '\n' \
-      'Folders: \n' + folders.join(', ') + '\n' \
+      "Files: \n\t" + file_names.join("\n\t") + "\n" \
+      "Folders: \n\t" + folder_names.join("\n\t") + "\n" \
     )
   end
 
