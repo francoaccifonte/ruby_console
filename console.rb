@@ -12,7 +12,7 @@ class Console
   def initialize
     @current_user = 1
     @exit_signal_received = false
-    @working_directory = Folder.new('/')
+    @working_directory = Folder.new
   end
 
   def listen
@@ -44,6 +44,17 @@ class Console
     name = args.first
     data = args[1..-1].join(' ')
     working_directory.create_file(name: name, data: data)
+  end
+
+  def create_folder(*args)
+    working_directory.create_folder(args.first)
+  end
+
+  def cd(*args)
+    return @working_directory = working_directory.up if args.first == '..'
+
+    folder_name = args.first
+    @working_directory = working_directory.cd(folder_name)
   end
 
   def exit
