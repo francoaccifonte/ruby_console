@@ -20,10 +20,14 @@ class File
 
   def print
     puts(
-      "file: \n\n#{path}"\
-      "data: \n\n#{data}\n\n" \
+      "file: \n#{path}\n\n"\
+      "data: \n#{data}\n\n" \
       "metadata: \n\n#{metadata}"
     )
+  end
+
+  def name
+    path.split('/').last
   end
 end
 

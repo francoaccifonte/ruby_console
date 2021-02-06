@@ -1,4 +1,5 @@
 require 'byebug'
+require 'yaml'
 load 'file.rb'
 load 'folder.rb'
 
@@ -6,6 +7,7 @@ class Console
   attr_accessor :current_user, :exit_signal_received,
                 :working_directory
   ACCEPTED_COMMANDS = %w[exit create_file show metadata create_folder cd destroy ls].freeze
+  SESSION_FILE = 'session.yaml'.freeze
 
   def initialize
     @current_user = 1
@@ -22,7 +24,10 @@ class Console
         puts e.message
       end
     end
+    persist_console
   end
+
+  private
 
   def parse_action(action)
     command_and_arguments = action.strip.split(' ')
@@ -36,7 +41,9 @@ class Console
   def create_file(*args)
     raise MissingArguments, 'Error creating file: File name required.' if args.empty?
 
-    working_directory.create_file(args[0])
+    name = args.first
+    data = args[1..-1].join(' ')
+    working_directory.create_file(name: name, data: data)
   end
 
   def exit
@@ -45,6 +52,14 @@ class Console
 
   def invalid_command(command)
     puts "Invalid command received: #{command}"
+  end
+
+  def persist_console # Validate if the object is changing while its being persisted
+    session = YAML.dump(self)
+    puts session
+    # File.open(SESSION_FILE, 'w') do |f|
+    #   f.write(session)
+    # end
   end
 end
 

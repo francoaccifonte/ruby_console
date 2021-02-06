@@ -7,9 +7,8 @@ class Folder
     @folders = []
   end
 
-  def create_file(file_name)
-    byebug
-    @files << File.new(file_name)
+  def create_file(name: file_name, data: nil)
+    @files << File.new(path: path + name, data: data)
   end
 
   def create_folder(folder_name)
