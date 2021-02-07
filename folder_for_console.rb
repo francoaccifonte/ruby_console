@@ -15,10 +15,14 @@ class FolderForConsole
   end
 
   def create_file(name: file_name, data: nil)
+    return puts "Error: File #{name} already exists" unless find_child_file(name).nil?
+
     @files << FileForConsole.new(path: path + name, data: data)
   end
 
-  def create_folder(folder_name)
+  def create_folder(folder_name:)
+    return puts "Error: Folder #{name} already exists" unless find_child_folder(folder_name).nil?
+
     @folders << FolderForConsole.new(name: folder_name, parent_folder: self)
   end
 
@@ -26,8 +30,8 @@ class FolderForConsole
     file_names = files.map(&:name)
     folder_names = folders.map(&:name)
     puts(
-      "Files: \n\t" + file_names.join("\n\t") + "\n" \
-      "Folders: \n\t" + folder_names.join("\n\t") + "\n" \
+      "Files: \n\t" + file_names.join("\n\t") +
+      "\nFolders: \n\t" + folder_names.join("\n\t")
     )
   end
 
@@ -42,8 +46,12 @@ class FolderForConsole
     self
   end
 
-  def print_file_data(file_name)
-    find_child_file(file_name).print_data
+  def print_file_data(file_name, type:)
+    target_file = find_child_file(file_name)
+    return "File #{file_name} does not exist" if target_file.nil?
+    return target_file.print_data if type == :data
+
+    target_file.print_metadata if type == :metadata
   end
 
   private

@@ -45,13 +45,19 @@ class Console
   def show(*args)
     return puts 'CommandError: file name missing' if args.empty?
 
-    working_directory.print_file_data(args.first)
+    working_directory.print_file_data(args.first, type: :metadata)
+  end
+
+  def metadata(*args)
+    return puts 'CommandError: file name missing' if args.empty?
+
+    working_directory.print_file_data(args.first, type: :metadata)
   end
 
   def create_folder(*args)
     return puts 'CommandError: folder name missing' if args.empty?
 
-    working_directory.create_folder(args.first)
+    working_directory.create_folder(folder_name: args.first)
   end
 
   def cd(*args)
