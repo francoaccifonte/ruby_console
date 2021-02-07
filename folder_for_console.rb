@@ -1,4 +1,4 @@
-class Folder
+class FolderForConsole
   attr_reader :path, :parent_folder, :name
   attr_accessor :files, :folders
   def initialize(name: nil, parent_folder: nil)
@@ -15,11 +15,11 @@ class Folder
   end
 
   def create_file(name: file_name, data: nil)
-    @files << File.new(path: path + name, data: data)
+    @files << FileForConsole.new(path: path + name, data: data)
   end
 
   def create_folder(folder_name)
-    @folders << Folder.new(name: folder_name, parent_folder: self)
+    @folders << FolderForConsole.new(name: folder_name, parent_folder: self)
   end
 
   def list_content
@@ -42,6 +42,10 @@ class Folder
     self
   end
 
+  def print_file_data(file_name)
+    find_child_file(file_name).print_data
+  end
+
   private
 
   def folder_names
@@ -50,5 +54,9 @@ class Folder
 
   def find_child_folder(folder_name)
     folders.detect { |f| f.name == folder_name }
+  end
+
+  def find_child_file(file_name)
+    files.detect { |f| f.name == file_name }
   end
 end

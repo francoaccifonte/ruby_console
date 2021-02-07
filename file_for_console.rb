@@ -1,13 +1,14 @@
 require 'byebug'
 
-class File
-  attr_accessor :data, :metadata, :path
+class FileForConsole
+  attr_accessor :data, :metadata, :path, :name
   REQUIRED_PARAMS = %i[data metadata path].freeze
 
   def initialize(params)
     @metadata = params[:metadata]
     @data = params[:data]
     @path = params[:path]
+    @name = @path.split('/').last
   end
 
   def print_data
@@ -25,18 +26,4 @@ class File
       "metadata: \n\n#{metadata}"
     )
   end
-
-  def name
-    path.split('/').last
-  end
-end
-
-# class FileInitializationError < StandardError; end
-
-if caller.size.zero?
-  File.new(
-    data: 'a',
-    metadata: 'b',
-    path: 'c'
-  ).print
 end

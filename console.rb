@@ -1,7 +1,7 @@
 require 'byebug'
 require 'yaml'
-load 'file.rb'
-load 'folder.rb'
+load 'file_for_console.rb'
+load 'folder_for_console.rb'
 
 class Console
   attr_accessor :current_user, :exit_signal_received,
@@ -11,18 +11,14 @@ class Console
   def initialize
     @current_user = 1
     @exit_signal_received = false
-    @working_directory = Folder.new
+    @working_directory = FolderForConsole.new
   end
 
   def listen
     @exit_signal_received = false
     until exit_signal_received
-      begin
-        action = gets
-        send(*parse_action(action))
-      rescue MissingArguments => e
-        puts e.message
-      end
+      action = gets
+      send(*parse_action(action))
     end
     self
   end
@@ -39,14 +35,22 @@ class Console
   end
 
   def create_file(*args)
-    raise MissingArguments, 'Error creating file: File name required.' if args.empty?
+    return puts 'ComandError creating file: File name required.' if args.empty?
 
     name = args.first
     data = args[1..-1].join(' ')
     working_directory.create_file(name: name, data: data)
   end
 
+  def show(*args)
+    return puts 'CommandError: file name missing' if args.empty?
+
+    working_directory.print_file_data(args.first)
+  end
+
   def create_folder(*args)
+    return puts 'CommandError: folder name missing' if args.empty?
+
     working_directory.create_folder(args.first)
   end
 
@@ -74,13 +78,6 @@ class Console
   end
 end
 
-class MissingArguments < StandardError
-  attr_reader :message
-  def initialize(message)
-    @message = message
-  end
-end
-
 def save_session(console)
   session = YAML.dump(console)
   puts session
@@ -92,7 +89,7 @@ def load_session
   YAML.load(File.read('session.yaml'))
 end
 
-# console = Console.new.listen
+# console = Console.new
 console = load_session
 console.listen
 save_session(console)
