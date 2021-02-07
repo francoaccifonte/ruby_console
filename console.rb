@@ -1,5 +1,6 @@
 require 'byebug'
 require 'yaml'
+require 'json'
 load 'file_for_console.rb'
 load 'folder_for_console.rb'
 
@@ -45,7 +46,7 @@ class Console
   def show(*args)
     return puts 'CommandError: file name missing' if args.empty?
 
-    working_directory.print_file_data(args.first, type: :metadata)
+    working_directory.print_file_data(args.first, type: :data)
   end
 
   def metadata(*args)
@@ -73,6 +74,12 @@ class Console
 
   def ls
     working_directory.list_content
+  end
+
+  def destroy(*args)
+    return puts 'CommandError: folder or file name missing' if args.empty?
+
+    working_directory.destroy(args.first)
   end
 
   def exit

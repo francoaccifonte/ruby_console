@@ -5,18 +5,19 @@ class FileForConsole
   REQUIRED_PARAMS = %i[data metadata path].freeze
 
   def initialize(params)
-    @metadata = params[:metadata]
+    @metadata = { created_at: Time.now }
     @data = params[:data]
     @path = params[:path]
     @name = @path.split('/').last
   end
 
   def print_data
+    @metadata[:read_at] = Time.now
     puts @data
   end
 
   def print_metadata
-    puts @metadata
+    puts JSON.pretty_generate(@metadata)
   end
 
   def print

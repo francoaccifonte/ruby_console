@@ -54,6 +54,16 @@ class FolderForConsole
     target_file.print_metadata if type == :metadata
   end
 
+  def destroy(file_or_folder)
+    folder = find_child_folder(file_or_folder)
+    return @folders -= [folder] unless folder.nil?
+
+    file = find_child_file(file_or_folder)
+    return @files -= [file] unless file.nil?
+
+    puts "Error: no file or folder named #{file_or_folder} found"
+  end
+
   private
 
   def folder_names
