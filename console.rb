@@ -21,7 +21,7 @@ class Console
   def listen
     @exit_signal_received = false
     until exit_signal_received
-      action = gets
+      action = STDIN.gets
       send(*parse_action(action))
     end
     self
@@ -44,7 +44,7 @@ class Console
 
     name = args.first
     data = args[1..-1].join(' ')
-    working_directory.create_file(name: name, data: data)
+    working_directory.create_file(name: name, data: data, user_name: auth_manager.current_user.name)
   end
 
   def show(*args)
@@ -112,7 +112,7 @@ class Console
 
   def login(*args)
     return puts 'CommandError: User name required' if args.empty?
-    return puts 'CommandError: Password required' if args.size ==1
+    return puts 'CommandError: Password required' if args.size == 1
 
     auth_manager.login(user_name: args[0], password: args[1])
   end
@@ -130,18 +130,21 @@ class Console
   end
 end
 
-def save_session(console)
+def save_session(console, file_name)
   session = YAML.dump(console)
-  puts session
-  file_name = 'session.yaml'
   File.write(file_name, session)
 end
 
-def load_session
-  YAML.load(File.read('session.yaml'))
+def load_session(file_name)
+  YAML.load(File.read(file_name))
 end
 
-# console = Console.new
-console = load_session
-console.listen
-save_session(console)
+if caller.size.zero? # Program starts here
+  console = if ARGV[0] == '-persisted'
+              load_session(ARGV[1])
+            else
+              Console.new
+            end
+  console.listen
+  save_session(console, ARGV[1]) if ARGV[0] == '-persisted'
+end

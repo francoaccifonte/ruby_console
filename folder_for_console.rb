@@ -14,10 +14,10 @@ class FolderForConsole
     @folders = []
   end
 
-  def create_file(name: file_name, data: nil)
+  def create_file(name: file_name, data: nil, user_name:)
     return puts "Error: File #{name} already exists" unless find_child_file(name).nil?
 
-    @files << FileForConsole.new(path: path + name, data: data)
+    @files << FileForConsole.new(path: path + name, data: data, user_name: user_name)
   end
 
   def create_folder(folder_name:)

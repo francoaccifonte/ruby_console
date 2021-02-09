@@ -5,7 +5,7 @@ class FileForConsole
   REQUIRED_PARAMS = %i[data metadata path].freeze
 
   def initialize(params)
-    @metadata = { created_at: Time.now }
+    @metadata = { created_at: Time.now, created_by: params[:user_name] }
     @data = params[:data]
     @path = params[:path]
     @name = @path.split('/').last
