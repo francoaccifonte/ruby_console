@@ -15,13 +15,13 @@ class FolderForConsole
   end
 
   def create_file(name: file_name, data: nil, user_name:)
-    return puts "Error: File #{name} already exists" unless find_child_file(name).nil?
+    return puts "Error: File #{name} already exists" if find_child_file(name)
 
     @files << FileForConsole.new(path: path + name, data: data, user_name: user_name)
   end
 
   def create_folder(folder_name:)
-    return puts "Error: Folder #{name} already exists" unless find_child_folder(folder_name).nil?
+    return puts "Error: Folder #{name} already exists" if find_child_folder(folder_name)
 
     @folders << FolderForConsole.new(name: folder_name, parent_folder: self)
   end
@@ -48,7 +48,7 @@ class FolderForConsole
 
   def print_file_data(file_name, type:)
     target_file = find_child_file(file_name)
-    return "File #{file_name} does not exist" if target_file.nil?
+    return puts "File #{file_name} does not exist" unless target_file
     return target_file.print_data if type == :data
 
     target_file.print_metadata if type == :metadata
@@ -56,10 +56,10 @@ class FolderForConsole
 
   def destroy(file_or_folder)
     folder = find_child_folder(file_or_folder)
-    return @folders -= [folder] unless folder.nil?
+    return @folders -= [folder] if folder
 
     file = find_child_file(file_or_folder)
-    return @files -= [file] unless file.nil?
+    return @files -= [file] if file
 
     puts "Error: no file or folder named #{file_or_folder} found"
   end

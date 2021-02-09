@@ -4,36 +4,13 @@ require 'json'
 load 'file_for_console.rb'
 load 'folder_for_console.rb'
 load 'authentication_manager.rb'
+load 'base_console.rb'
 
-class Console
-  attr_accessor :current_user, :exit_signal_received,
-                :working_directory, :auth_manager
-  ACCEPTED_COMMANDS = %w[exit create_file show metadata create_folder cd destroy ls whereami
-                         create_user update_password destroy_user login whoami].freeze
-
-  def initialize
-    @working_directory = FolderForConsole.new
-    @auth_manager = AuthenticationManager.new
-  end
-
-  def listen
-    @exit_signal_received = false
-    until exit_signal_received
-      action = STDIN.gets
-      send(*parse_action(action))
-    end
-    self
-  end
-
-  private
-
-  def parse_action(action)
-    command_and_arguments = action.strip.split(' ')
-    command_name = command_and_arguments.first
-    arguments = command_and_arguments[1..-1]
-    return [command_name.to_sym, *arguments] if ACCEPTED_COMMANDS.include?(command_name)
-
-    [:invalid_command, action]
+class Console < BaseConsole
+  def accepted_commands
+    base_commands = super
+    %w[create_file show metadata create_folder cd destroy ls whereami
+       create_user update_password destroy_user login whoami] + base_commands
   end
 
   def create_file(*args)
@@ -117,14 +94,6 @@ class Console
 
   def whoami
     auth_manager.whoami
-  end
-
-  def exit
-    @exit_signal_received = true
-  end
-
-  def invalid_command(command)
-    puts "Invalid command received: #{command}"
   end
 end
 
