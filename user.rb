@@ -38,16 +38,3 @@ class User
     @password = new_password
   end
 end
-
-class Chau
-  def do(_a)
-    byebug
-  end
-end
-
-if caller.length == 0
-  fa = User.new(name: 'franco', password: 'fafa')
-  Chau.new.do(fa)
-  byebug
-end
-

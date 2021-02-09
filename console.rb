@@ -12,8 +12,6 @@ class Console
                          create_user update_password destroy_user login whoami].freeze
 
   def initialize
-    @current_user = 1
-    @exit_signal_received = false
     @working_directory = FolderForConsole.new
     @auth_manager = AuthenticationManager.new
   end
@@ -39,8 +37,8 @@ class Console
   end
 
   def create_file(*args)
-    return puts 'UserError: you dont have enough permissions to create a file' if auth_manager.current_user.read_only?
-    return puts 'ComandError creating file: File name required.' if args.empty?
+    return puts 'UserError: you dont have enough permissions to create a file' unless auth_manager.can_create_file?
+    return puts 'ComandError: file name required.' if args.empty?
 
     name = args.first
     data = args[1..-1].join(' ')
@@ -48,20 +46,20 @@ class Console
   end
 
   def show(*args)
-    return puts 'CommandError: file name missing' if args.empty?
+    return puts 'CommandError: file name required' if args.empty?
 
     working_directory.print_file_data(args.first, type: :data)
   end
 
   def metadata(*args)
-    return puts 'CommandError: file name missing' if args.empty?
+    return puts 'CommandError: file name required' if args.empty?
 
     working_directory.print_file_data(args.first, type: :metadata)
   end
 
   def create_folder(*args)
-    return puts 'UserError: you dont have enough permissions to create a folder' if auth_manager.current_user.read_only?
-    return puts 'CommandError: folder name missing' if args.empty?
+    return puts 'UserError: you dont have enough permissions to create a folder' unless auth_manager.can_create_folder?
+    return puts 'CommandError: folder name required' if args.empty?
 
     working_directory.create_folder(folder_name: args.first)
   end
@@ -82,16 +80,16 @@ class Console
   end
 
   def destroy(*args)
-    return puts 'UserError: you dont have enough permissions to delete files' if auth_manager.current_user.read_only?
-    return puts 'CommandError: folder or file name missing' if args.empty?
+    return puts 'UserError: you dont have enough permissions to delete files' unless auth_manager.can_delete_file?
+    return puts 'CommandError: folder or file name required' if args.empty?
 
     working_directory.destroy(args.first)
   end
 
   def create_user(*args)
-    return puts 'CommandError: user name missing' if args.empty?
-    return puts 'CommandError: user password missing' if args.length == 1
-    return puts 'CommandError: user role missing' if args.length == 2
+    return puts 'CommandError: user name required' if args.empty?
+    return puts 'CommandError: user password required' if args.length == 1
+    return puts 'CommandError: user role required' if args.length == 2
     return puts 'CommandError: invalid flag' unless args[2].match(/-role=.*/)
 
     auth_manager.create_user(name: args[0], password: args[1], role: args[2])

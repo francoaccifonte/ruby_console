@@ -57,6 +57,18 @@ class AuthenticationManager
     puts "Current user: #{@current_user.name}"
   end
 
+  def can_create_file?
+    !@current_user.read_only?
+  end
+
+  def can_create_folder?
+    !@current_user.read_only?
+  end
+
+  def can_delete_file?
+    !@current_user.read_only?
+  end
+
   private
 
   def initialize_root_user
