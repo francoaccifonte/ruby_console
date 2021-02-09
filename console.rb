@@ -103,6 +103,8 @@ def save_session(console, file_name)
 end
 
 def load_session(file_name)
+  return Console.new unless File.file?(file_name)
+
   console = YAML.load(File.read(file_name))
   return console if console
 
