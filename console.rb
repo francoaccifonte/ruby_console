@@ -3,16 +3,19 @@ require 'yaml'
 require 'json'
 load 'file_for_console.rb'
 load 'folder_for_console.rb'
+load 'authentication_manager.rb'
 
 class Console
   attr_accessor :current_user, :exit_signal_received,
-                :working_directory
-  ACCEPTED_COMMANDS = %w[exit create_file show metadata create_folder cd destroy ls whereami].freeze
+                :working_directory, :auth_manager
+  ACCEPTED_COMMANDS = %w[exit create_file show metadata create_folder cd destroy ls whereami
+                         create_user update_password destroy_user login whoami].freeze
 
   def initialize
     @current_user = 1
     @exit_signal_received = false
     @working_directory = FolderForConsole.new
+    @auth_manager = AuthenticationManager.new
   end
 
   def listen
@@ -36,6 +39,7 @@ class Console
   end
 
   def create_file(*args)
+    return puts 'UserError: you dont have enough permissions to create a file' if auth_manager.current_user.read_only?
     return puts 'ComandError creating file: File name required.' if args.empty?
 
     name = args.first
@@ -56,6 +60,7 @@ class Console
   end
 
   def create_folder(*args)
+    return puts 'UserError: you dont have enough permissions to create a folder' if auth_manager.current_user.read_only?
     return puts 'CommandError: folder name missing' if args.empty?
 
     working_directory.create_folder(folder_name: args.first)
@@ -77,9 +82,43 @@ class Console
   end
 
   def destroy(*args)
+    return puts 'UserError: you dont have enough permissions to delete files' if auth_manager.current_user.read_only?
     return puts 'CommandError: folder or file name missing' if args.empty?
 
     working_directory.destroy(args.first)
+  end
+
+  def create_user(*args)
+    return puts 'CommandError: user name missing' if args.empty?
+    return puts 'CommandError: user password missing' if args.length == 1
+    return puts 'CommandError: user role missing' if args.length == 2
+    return puts 'CommandError: invalid flag' unless args[2].match(/-role=.*/)
+
+    auth_manager.create_user(name: args[0], password: args[1], role: args[2])
+  end
+
+  def update_password(*args)
+    return puts 'CommandError: current password required' if args.empty?
+    return puts 'CommandError: new password required' if args.size == 1
+
+    auth_manager.update_password(current_password: args.first, new_password: ags.second)
+  end
+
+  def destroy_user(*args)
+    return puts 'CommandError: user name required' if args.empty?
+
+    auth_manager.destroy_user(args[0])
+  end
+
+  def login(*args)
+    return puts 'CommandError: User name required' if args.empty?
+    return puts 'CommandError: Password required' if args.size ==1
+
+    auth_manager.login(user_name: args[0], password: args[1])
+  end
+
+  def whoami
+    auth_manager.whoami
   end
 
   def exit
