@@ -1,0 +1,15 @@
+--- !ruby/object:Console
+working_directory: &1 !ruby/object:FolderForConsole
+  path: "/"
+  parent_folder: *1
+  files: []
+  folders: []
+auth_manager: !ruby/object:AuthenticationManager
+  current_user: &2 !ruby/object:User
+    name: root
+    role: :super
+    password: '123'
+    creator: 
+  users:
+  - *2
+exit_signal_received: true

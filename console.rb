@@ -103,7 +103,10 @@ def save_session(console, file_name)
 end
 
 def load_session(file_name)
-  YAML.load(File.read(file_name))
+  console = YAML.load(File.read(file_name))
+  return console if console
+
+  Console.new
 end
 
 if caller.size.zero? # Program starts here
